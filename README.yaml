@@ -1,0 +1,65 @@
+---
+#
+# This is the canonical configuration for the `README.md`
+# Run `make readme` to rebuild the `README.md`
+#
+
+# Name of this project
+name: terraform-aws-concourse-web
+
+# Logo for this project
+#logo: docs/logo.png
+
+# License of this project
+#license: "APACHE2"
+
+# Canonical GitHub repo
+github_repo: carnegierobotics/terraform-aws-concourse-web
+
+# Badges to display
+#badges:
+#  - name: "Codefresh Build Status"
+#    image: "https://g.codefresh.io/api/badges/pipeline/cloudposse/terraform-modules%2Fterraform-aws-ecs-alb-service-task?type=cf-1"
+#    url: "https://g.codefresh.io/public/accounts/cloudposse/pipelines/5db352c10c7c5a56af1de612"
+#  - name: "Latest Release"
+#    image: "https://img.shields.io/github/release/cloudposse/terraform-aws-ecs-alb-service-task.svg"
+#    url: "https://github.com/cloudposse/terraform-aws-ecs-alb-service-task/releases/latest"
+#  - name: "Slack Community"
+#    image: "https://slack.cloudposse.com/badge.svg"
+#    url: "https://slack.cloudposse.com"
+
+related:
+    - name: "terraform-aws-concourse-ec2-worker"
+      description: "Terraform module for deploying a Concourse EC2 worker ASG"
+      url: "https://github.com/carnegierobotics/terraform-aws-concourse-ec2-worker"
+    - name: "terraform-aws-concourse-keys-s3"
+      description: "Terraform module for deploying Concourse TLS / SSH keys to S3"
+      url: "https://github.com/carnegierobotics/terraform-aws-concourse-keys-s3"
+    - name: "terraform-aws-concourse-sidecred-lambda"
+      description: "Terraform module to create a sidecred lambda for injecting and rotating credentials into SSM"
+      url: "https://github.com/carnegierobotics/terraform-aws-concourse-sidecred-lambda"
+    - name: "terraform-root-modules"
+      description: "Terraform root modules to provision top level account"
+      url: "https://github.com/carnegierobotics/terraform-root-modules"
+
+# Short description of this project
+description: |-
+  Terraform module to deploy the web frontend of Concourse on ECS.
+
+# How to use this project
+usage: |-
+
+  TODO
+
+# Other files to include in this README from the project folder
+include:
+  - "docs/targets.md"
+  - "docs/terraform.md"
+
+copyrights:
+  - name: "Cloud Posse, LLC"
+    url: "https://cpco.io/copyright"
+    year: "2017"
+  - name: "Carnegie Robotics, LLC"
+    url: "https://carnegierobotics.com/"
+    year: "2020"
