@@ -36,8 +36,7 @@ module "alb" {
 }
 
 module "nlb" {
-  # TODO: move to CloudPosse repo
-  source             = "git::https://github.com/jhosteny/terraform-aws-nlb.git?ref=tags/0.0.1"
+  source             = "git::https://github.com/cloudposse/terraform-aws-nlb.git?ref=tags/0.2.0"
   name               = var.name
   namespace          = var.namespace
   stage              = var.stage
@@ -204,7 +203,7 @@ resource "aws_sns_topic" "sns_topic" {
 }
 
 module "web" {
-  source     = "git::https://github.com/cloudposse/terraform-aws-ecs-web-app.git?ref=tags/0.28.0"
+  source     = "git::https://github.com/cloudposse/terraform-aws-ecs-web-app.git?ref=tags/0.31.0"
   name       = var.name
   namespace  = var.namespace
   stage      = var.stage
@@ -286,12 +285,14 @@ module "web" {
     { name = "VPC_ID", value = var.vpc_id }
   ]
 
-  codepipeline_enabled  = false
-  repo_owner            = "dummy"
-  github_webhooks_token = "dummy"
-  github_oauth_token    = "dummy"
-  autoscaling_enabled   = var.autoscaling_enabled
-  autoscaling_dimension = var.autoscaling_dimension
+  codepipeline_enabled      = false
+  repo_owner                = var.concourse_main_team_github_org
+  github_webhooks_token     = ""
+  github_webhooks_anonymous = true
+  github_oauth_token        = "dummy"
+  webhook_enabled           = false
+  autoscaling_enabled       = var.autoscaling_enabled
+  autoscaling_dimension     = var.autoscaling_dimension
 
   aws_logs_region        = var.region
   log_retention_in_days  = 7
