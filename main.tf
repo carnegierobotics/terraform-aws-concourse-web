@@ -203,7 +203,7 @@ resource "aws_sns_topic" "sns_topic" {
 }
 
 module "web" {
-  source     = "git::https://github.com/cloudposse/terraform-aws-ecs-web-app.git?ref=tags/0.31.0"
+  source     = "git::https://github.com/cloudposse/terraform-aws-ecs-web-app.git?ref=tags/0.32.0"
   name       = var.name
   namespace  = var.namespace
   stage      = var.stage
