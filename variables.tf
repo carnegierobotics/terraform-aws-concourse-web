@@ -128,6 +128,36 @@ variable "concourse_db_password" {
   default     = ""
 }
 
+variable "container_cpu" {
+  type        = number
+  description = "The vCPU setting to control cpu limits of container"
+  default     = 256
+}
+
+variable "container_memory" {
+  type        = number
+  description = "The amount of RAM to allow container to use in MB"
+  default     = 512
+}
+
+variable "container_memory_reservation" {
+  type        = number
+  description = "The amount of RAM (Soft Limit) to allow container to use in MB. This value must be less than `container_memory` if set"
+  default     = 128
+}
+
+variable "task_cpu" {
+  type        = number
+  description = "The number of CPU units used by the task"
+  default     = null
+}
+
+variable "task_memory" {
+  type        = number
+  description = "The amount of memory (in MiB) used by the task"
+  default     = null
+}
+
 variable "concourse_github_auth_client_id" {
   type        = string
   description = "Github client id"

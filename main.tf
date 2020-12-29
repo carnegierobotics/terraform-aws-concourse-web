@@ -213,10 +213,13 @@ module "web" {
   region     = var.region
   vpc_id     = var.vpc_id
 
-  container_image = "${var.concourse_docker_image}:${var.concourse_version}"
-  command         = ["web"]
-  task_cpu        = 1024
-  task_memory     = 2048
+  container_image               = "${var.concourse_docker_image}:${var.concourse_version}"
+  command                       = ["web"]
+  container_cpu                 = var.container_cpu
+  container_memory              = var.container_memory
+  container_memory_reservation  = var.container_memory_reservation
+  task_cpu                      = var.task_cpu
+  task_memory                   = var.task_memory
 
   init_containers = [
     {
