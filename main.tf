@@ -285,6 +285,7 @@ module "web" {
     { name = "CONCOURSE_MAIN_TEAM_GITHUB_TEAM", value = var.concourse_main_team_github_team },
     { name = "CONCOURSE_AWS_SSM_REGION", value = var.region },
     { name = "LAUNCH_TYPE", value = "FARGATE" },
+    { name = "CONCOURSE_ENABLE_REDACT_SECRETS", value = "true" },
     { name = "VPC_ID", value = var.vpc_id }
   ]
 
