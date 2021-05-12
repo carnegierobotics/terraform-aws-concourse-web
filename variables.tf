@@ -3,40 +3,6 @@ variable "region" {
   description = "AWS Region for deployment"
 }
 
-variable "namespace" {
-  type        = string
-  description = "Namespace (e.g. `cp` or `cloudposse`)"
-}
-
-variable "stage" {
-  type        = string
-  description = "Stage (e.g. `prod`, `dev`, `staging`)"
-}
-
-variable "name" {
-  type        = string
-  description = "Application or solution name (e.g. `app`)"
-  default     = "concourse"
-}
-
-variable "delimiter" {
-  type        = string
-  description = "Delimiter to be used between `namespace`, `stage`, `name` and `attributes`"
-  default     = "-"
-}
-
-variable "attributes" {
-  type        = list(string)
-  description = "Additional attributes (e.g. `1`)"
-  default     = []
-}
-
-variable "tags" {
-  type        = map(string)
-  description = "Additional tags (e.g. map(`BusinessUnit`,`XYZ`)"
-  default     = {}
-}
-
 variable "ingress_cidr_blocks_https" {
   type        = list(string)
   description = "List of CIDR blocks allowed to access Concourse over HTTPS"
@@ -46,11 +12,6 @@ variable "ingress_cidr_blocks_https" {
 variable "certificate_arn" {
   type        = string
   description = "ARN of the ALB (HTTPS) certificate"
-}
-
-variable "tsa_certificate_arn" {
-  type        = string
-  description = "ARN of the NLB certificate"
 }
 
 variable "external_url_https" {

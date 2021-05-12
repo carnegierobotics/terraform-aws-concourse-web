@@ -1,23 +1,10 @@
-module "default_label" {
-  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.16.0"
-  name       = var.name
-  namespace  = var.namespace
-  stage      = var.stage
-  tags       = var.tags
-  attributes = var.attributes
-  delimiter  = var.delimiter
-}
-
 module "alb" {
-  source             = "git::https://github.com/cloudposse/terraform-aws-alb.git?ref=tags/0.8.0"
-  name               = var.name
-  namespace          = var.namespace
-  stage              = var.stage
-  attributes         = compact(concat(var.attributes, ["alb"]))
-  vpc_id             = var.vpc_id
-  ip_address_type    = "ipv4"
-  subnet_ids         = var.public_subnet_ids
-  access_logs_region = var.region
+  source  = "cloudposse/alb/aws"
+  version = "0.33.0"
+
+  vpc_id          = var.vpc_id
+  ip_address_type = "ipv4"
+  subnet_ids      = var.public_subnet_ids
 
   http_enabled              = false
   https_enabled             = true
@@ -32,24 +19,23 @@ module "alb" {
   alb_access_logs_s3_bucket_force_destroy = true
 
   # Shorten name to meet 32 char restriction
-  target_group_name = join(var.delimiter, [module.default_label.id, "alb", "dflt"])
+  target_group_name = join(module.this.delimiter, [module.this.id, "alb", "dflt"])
+
+  context     = module.this.context
+  attributes  = ["alb"]
 }
 
 module "nlb" {
-  source             = "git::https://github.com/cloudposse/terraform-aws-nlb.git?ref=tags/0.2.0"
-  name               = var.name
-  namespace          = var.namespace
-  stage              = var.stage
-  attributes         = compact(concat(var.attributes, ["nlb"]))
-  vpc_id             = var.vpc_id
-  ip_address_type    = "ipv4"
-  subnet_ids         = var.public_subnet_ids
-  access_logs_region = var.region
+  source  = "cloudposse/nlb/aws"
+  version = "0.8.0"
+
+  vpc_id          = var.vpc_id
+  ip_address_type = "ipv4"
+  subnet_ids      = var.public_subnet_ids
 
   tcp_enabled           = true
   tcp_port              = 2222
   target_group_port     = 2222
-  certificate_arn       = var.tsa_certificate_arn
   health_check_protocol = "HTTP"
   health_check_port     = 80
   health_check_interval = 30
@@ -58,14 +44,17 @@ module "nlb" {
   nlb_access_logs_s3_bucket_force_destroy = true
 
   # Shorten name to meet 32 char restriction
-  target_group_name = join(var.delimiter, [module.default_label.id, "nlb", "dflt"])
+  target_group_name = join(module.this.delimiter, [module.this.id, "nlb", "dflt"])
+
+  context     = module.this.context
+  attributes  = ["nlb"]
 }
 
 data "aws_iam_policy_document" "default" {
   statement {
     effect = "Allow"
     resources = [
-      "${var.keys_bucket_arn}",
+      var.keys_bucket_arn,
       "${var.keys_bucket_arn}/*"
     ]
     actions = [
@@ -76,7 +65,7 @@ data "aws_iam_policy_document" "default" {
 }
 
 resource "aws_iam_policy" "default" {
-  name   = module.default_label.id
+  name   = module.this.id
   policy = data.aws_iam_policy_document.default.json
 }
 
@@ -86,7 +75,9 @@ resource "aws_iam_role_policy_attachment" "default" {
 }
 
 module "download_keys_container_definition" {
-  source          = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.22.0"
+  source  = "cloudposse/ecs-container-definition/aws"
+  version = "0.56.0"
+
   container_name  = "download_keys"
   container_image = "mesosphere/aws-cli:latest"
   essential       = false
@@ -131,7 +122,9 @@ locals {
 }
 
 module "create_db_container_definition" {
-  source          = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.22.0"
+  source  = "cloudposse/ecs-container-definition/aws"
+  version = "0.56.0"
+
   container_name  = "create_db"
   container_image = "postgres:${var.db_version}"
   essential       = false
@@ -194,24 +187,20 @@ module "create_db_container_definition" {
 
 # ECS Cluster (needed even if using FARGATE launch type)
 resource "aws_ecs_cluster" "default" {
-  name = module.default_label.id
+  name = module.this.id
 }
 
 resource "aws_sns_topic" "sns_topic" {
-  name = module.default_label.id
-  tags = module.default_label.tags
+  name = module.this.id
+  tags = module.this.tags
 }
 
 module "web" {
-  source     = "git::https://github.com/cloudposse/terraform-aws-ecs-web-app.git?ref=tags/0.32.0"
-  name       = var.name
-  namespace  = var.namespace
-  stage      = var.stage
-  tags       = var.tags
-  attributes = compact(concat(var.attributes, ["web"]))
-  delimiter  = var.delimiter
-  region     = var.region
-  vpc_id     = var.vpc_id
+  source  = "cloudposse/ecs-web-app/aws"
+  version = "0.61.0"
+
+  region = var.region
+  vpc_id = var.vpc_id
 
   container_image               = "${var.concourse_docker_image}:${var.concourse_version}"
   command                       = ["web"]
@@ -223,11 +212,11 @@ module "web" {
 
   init_containers = [
     {
-      container_definition = module.download_keys_container_definition.json_map,
+      container_definition = module.download_keys_container_definition.json_map_encoded,
       condition            = "SUCCESS"
     },
     {
-      container_definition = module.create_db_container_definition.json_map,
+      container_definition = module.create_db_container_definition.json_map_encoded,
       condition            = "SUCCESS"
     }
   ]
@@ -260,7 +249,8 @@ module "web" {
     {
       name                        = "concourse_keys",
       host_path                   = null,
-      docker_volume_configuration = []
+      docker_volume_configuration = [],
+      efs_volume_configuration    = []
     }
   ]
 
@@ -271,7 +261,7 @@ module "web" {
     }
   ]
 
-  environment = [
+  container_environment = [
     { name = "CONCOURSE_POSTGRES_HOST", value = var.db_hostname },
     { name = "CONCOURSE_POSTGRES_PORT", value = var.db_port },
     { name = "CONCOURSE_POSTGRES_USER", value = var.concourse_db_username },
@@ -291,8 +281,6 @@ module "web" {
 
   codepipeline_enabled      = false
   repo_owner                = var.concourse_main_team_github_org
-  github_webhooks_token     = ""
-  github_webhooks_anonymous = true
   github_oauth_token        = "dummy"
   webhook_enabled           = false
   autoscaling_enabled       = var.autoscaling_enabled
@@ -324,6 +312,9 @@ module "web" {
   # All paths are unauthenticated
   alb_ingress_unauthenticated_paths             = ["/*"]
   alb_ingress_listener_unauthenticated_priority = 100
+
+  context     = module.this.context
+  attributes  = ["web"]
 }
 
 data "aws_vpc" "default" {
