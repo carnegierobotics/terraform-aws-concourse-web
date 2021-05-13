@@ -19,7 +19,7 @@ module "alb" {
   alb_access_logs_s3_bucket_force_destroy = true
 
   # Shorten name to meet 32 char restriction
-  target_group_name = join(module.this.delimiter, [module.this.id, "alb", "dflt"])
+  target_group_name = join(module.this.delimiter, [module.this.id, "alb"])
 
   context     = module.this.context
   attributes  = ["alb"]
@@ -44,7 +44,7 @@ module "nlb" {
   nlb_access_logs_s3_bucket_force_destroy = true
 
   # Shorten name to meet 32 char restriction
-  target_group_name = join(module.this.delimiter, [module.this.id, "nlb", "dflt"])
+  target_group_name = join(module.this.delimiter, [module.this.id, "nlb"])
 
   context     = module.this.context
   attributes  = ["nlb"]
